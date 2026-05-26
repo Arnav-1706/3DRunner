@@ -16,11 +16,19 @@ public class CheckCollisions : MonoBehaviour
     public Animator PlayerAnim;
     public GameObject Player;
     public GameObject FinishPanel;
+    public AudioClip coinSound;
+    public AudioClip hitSound;
+    public AudioClip winSound;
+    public GameObject speedParticle;
+    public GameObject slowParticle;
+
+    private AudioSource audioSource;
 
     private InGameRanking ig;
 
     private void Start()
     {
+        audioSource = GetComponent<AudioSource>();
         PlayerStartPos = new Vector3(transform.position.x, transform.position.y, transform.position.z);
         speedBoosterIcon.SetActive(false);
         ig = FindObjectOfType<InGameRanking>();
@@ -31,11 +39,13 @@ public class CheckCollisions : MonoBehaviour
         if (other.CompareTag("Coin"))
         {
             AddCoin();
+            audioSource.PlayOneShot(coinSound);
             //Destroy(other.gameObject);
             other.gameObject.SetActive(false);
         }
         else if (other.CompareTag("Finish"))
         {
+            audioSource.PlayOneShot(winSound);
             if (ig.namesTxt[6].text == "Player" && score >= maxScore)
             {
                 PlayerFinished();
@@ -49,12 +59,14 @@ public class CheckCollisions : MonoBehaviour
         }
         else if (other.CompareTag("SpeedBoost"))
         {
+            Instantiate(speedParticle, transform.position, Quaternion.identity);
             playerController.runningSpeed += 3f;
             speedBoosterIcon.SetActive(true);
             StartCoroutine(SlowAfterAWhileCoroutine());
         }
         else if (other.CompareTag("SlownessObs"))
         {
+            Instantiate(slowParticle, transform.position, Quaternion.identity);
             playerController.runningSpeed -= 3f;
             slownessIcon.SetActive(true);
             StartCoroutine(FastAfterAWhileCoroutine());
@@ -78,6 +90,7 @@ public class CheckCollisions : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Collision"))
         {
+            audioSource.PlayOneShot(hitSound);
             //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
             transform.position = PlayerStartPos;
         }

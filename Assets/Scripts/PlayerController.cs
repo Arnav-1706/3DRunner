@@ -4,73 +4,55 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    public float runningSpeed;
-    float touchXDelta = 0;
-    float newX = 0;
-    public float xSpeed;
-    public float limitX;
+    public float runningSpeed = 2f;
+    public float xSpeed = 0.001f;
+    public float limitX = 3f;
 
     private Animator animator;
     private bool isRunning = false;
-    private void Start()
+
+    void Start()
     {
         animator = GetComponent<Animator>();
-        SetRunning(false);
     }
 
-    [System.Obsolete]
     void Update()
     {
-        SwipeCheck();
-    }
-
-    [System.Obsolete]
-    private void SwipeCheck()
-    {
-        if (!isRunning)
-        {
-            if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
-            {
-                GameManager.instance.StartGame();
-            }
-            else if (Input.GetMouseButtonDown(0))
-            {
-                GameManager.instance.StartGame();
-            }
-        }
-
         if (isRunning)
         {
-            if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Moved)
-            {
-                touchXDelta = Input.GetTouch(0).deltaPosition.x / Screen.width;
-            }
-            else if (Input.GetMouseButton(0))
-            {
-                touchXDelta = Input.GetAxis("Mouse X");
-            }
-            else
-            {
-                touchXDelta = 0;
-            }
-            newX = transform.position.x + xSpeed * touchXDelta * Time.deltaTime;
-            newX = Mathf.Clamp(newX, -limitX, limitX);
+            float hi = 0f;
 
-            Vector3 newPosition = new(newX, transform.position.y, transform.position.z + runningSpeed * Time.deltaTime);
-            transform.position = newPosition;
+            if (Input.GetKey(KeyCode.A))
+            {
+                hi = -1f;
+            }
+
+            if (Input.GetKey(KeyCode.D))
+            {
+                hi = 1f;
+            }
+
+            Vector3 pos = transform.position;
+
+            pos.x += hi * 3f * Time.deltaTime;
+
+            pos.x = Mathf.Clamp(pos.x, -3.75f, 3.75f);
+
+            pos.z += runningSpeed * Time.deltaTime;
+
+            transform.position = pos;
+
+            if (animator != null)
+            {
+                animator.SetBool("Running", true);
+            }
         }
     }
 
     public void StartRunning()
     {
+        Debug.Log("PLAYER STARTED");
+
         isRunning = true;
-        SetRunning(true);
-    }
-    void SetRunning(bool running)
-    {
-        if (animator != null)
-        {
-            animator.SetBool("Running", running);
-        }
     }
 }

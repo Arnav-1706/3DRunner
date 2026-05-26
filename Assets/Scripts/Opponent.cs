@@ -17,11 +17,17 @@ public class Opponent : MonoBehaviour
     void Start()
     {
         OpponentAgent = GetComponent<NavMeshAgent>();
-        OpponentStartPos = new Vector3(transform.position.x, transform.position.y, transform.position.z);
+
+        OpponentStartPos = new Vector3(
+            transform.position.x,
+            transform.position.y,
+            transform.position.z
+        );
+
         speedBoosterIcon.SetActive(false);
 
-        animator = GetComponent<Animator>(); 
-        SetRunning(false);
+        animator = GetComponent<Animator>();
+
     }
 
     [System.Obsolete]
@@ -35,7 +41,7 @@ public class Opponent : MonoBehaviour
 
         if (GameManager.instance.isGameOver)
         {
-            OpponentAgent.Stop();
+            OpponentAgent.isStopped = true;
         }
 
     }
@@ -81,8 +87,16 @@ public class Opponent : MonoBehaviour
     [System.Obsolete]
     public void StartRunning()
     {
+        Debug.Log(name + " StartRunning called");
+
         isRunning = true;
-        OpponentAgent.Resume();
+
+        OpponentAgent.isStopped = false;
+
+        OpponentAgent.SetDestination(Target.transform.position);
+
+        Debug.Log("Has path: " + OpponentAgent.hasPath);
+
         SetRunning(true);
     }
 

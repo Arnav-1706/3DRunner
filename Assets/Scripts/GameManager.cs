@@ -51,38 +51,37 @@ public class GameManager : MonoBehaviour
         ig.g = sortArray[0].name;
     }
 
+
     [System.Obsolete]
     void Update()
     {
         CalculateRank();
 
-        if (!isGameStarted && (Input.GetMouseButtonDown(0) || Input.touchCount > 0))
+        if (!isGameStarted)
         {
-            StartGame();
+            isGameStarted = true;
+            Invoke(nameof(StartGame), 1f);
         }
     }
 
     [System.Obsolete]
     public void StartGame()
     {
-        if (!isGameStarted)
+        foreach (GameObject runner in runners)
         {
-            isGameStarted = true;
+            PlayerController playerController = runner.GetComponent<PlayerController>();
 
-            foreach (GameObject runner in runners)
+            if (playerController != null)
             {
-                PlayerController playerController = runner.GetComponent<PlayerController>();
-                if (playerController != null)
+                playerController.StartRunning();
+            }
+            else
+            {
+                Opponent opponent = runner.GetComponent<Opponent>();
+
+                if (opponent != null)
                 {
-                    playerController.StartRunning();
-                }
-                else
-                {
-                    Opponent opponent = runner.GetComponent<Opponent>();
-                    if (opponent != null)
-                    {
-                        opponent.StartRunning();
-                    }
+                    opponent.StartRunning();
                 }
             }
         }
